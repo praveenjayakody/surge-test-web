@@ -9,7 +9,7 @@ import { Auth } from '../util/Api/Auth.js'
 
 import Navigation from "../components/Navigation";
 
-import { GoogleLogin } from 'react-google-login';
+// import { GoogleLogin } from 'react-google-login';
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -94,7 +94,7 @@ export default function SignIn() {
 					<Grid item lg={12} xs={12}>
 						<Button variant="contained" color="primary" className={styles.fullWidth} onClick={_signIn}>Log In</Button>
 					</Grid>
-					<Grid item lg={12} xs={12}>
+					{/* <Grid item lg={12} xs={12}>
 						<Grid container spacing={2}>
 							<Grid item lg={4} xs={12}></Grid>
 							<Grid item lg={4} xs={12}>
@@ -107,7 +107,7 @@ export default function SignIn() {
 							</Grid>
 							<Grid item lg={4} xs={12}></Grid>
 						</Grid>
-					</Grid>
+					</Grid> */}
 				</Grid>
 			</Grid>
 			<Grid item lg={4} xs={1}></Grid>
