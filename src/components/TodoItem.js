@@ -50,14 +50,14 @@ export default function TodoItem(props) {
                             </ToggleButton>
                         </ToggleButtonGroup>
                     </Grid>
-                    <Grid item>
+                    {/*<Grid item>
                         <IconButton aria-label="upload picture" component="span" onClick={props.onEdit}>
                             <EditIcon />
                         </IconButton>
                         <IconButton color="primary" aria-label="upload picture" component="span" onClick={props.onDelete}>
                             <DeleteIcon />
                         </IconButton>
-                    </Grid>
+                    </Grid>*/}
                 </Grid>
                 <Divider style={{marginTop: 10, marginBottom: 10}} />
                 <Typography variant="body1">
