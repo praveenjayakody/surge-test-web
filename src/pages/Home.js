@@ -1,74 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Button from '@material-ui/core/Button';
 import Navigation from "../components/Navigation";
+import TodoItem from "../components/TodoItem";
+import Prompt from "../components/Prompt";
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 
-import Box from '@material-ui/core/Box';
+import AddIcon from '@material-ui/icons/Add';
+
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import Skeleton from '@material-ui/lab/Skeleton';
+import Snackbar from '@material-ui/core/Snackbar';
+import Fab from '@material-ui/core/Fab';
+
+import { Todo } from '../util/Api/Todo.js'
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
-  },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
-    },
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
@@ -80,14 +33,10 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
   },
 }));
 
@@ -95,31 +44,95 @@ export default function Home() {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
+  const [todos, setTodos] = useState(undefined);
+  const [toast, setToast] = useState(undefined);
+  const [promptShown, setPromptShown] = useState(false);
+
+  const _loadTodos = () => {
+    Todo.list().then(async (resp) => {
+      if (resp.status === 200) {
+        setTodos(await resp.json());
+      }
+    }).catch((e) => {
+      console.log(e);
+      setToast("Unexpected error ocurred");
+    });
+  }
+  useEffect(_loadTodos, []);
+
+  const _handleStatus = async (id, status) => {
+    const resp = await Todo.update(id, { status: status });
+
+    if (typeof resp.error === "undefined" && resp.status === 200) {
+      // update UI
+      setTodos(
+        todos.map(t => t.id === id ? {...t, status: status }: t)
+      );
+      setToast("Changed status to " + status);
+    } else {
+      setToast("Unable to change status");
+    }
+  }
+
+  const _addTodo = async (t) => {
+    setPromptShown(false);
+    const resp = await Todo.store({
+      status: "todo",
+      content: t
+    });
+
+    if (resp.status === 201) {
+      _loadTodos();
+    } else {
+      setToast("Could not add new todo");
+    }
+  }
+
   return (<div className={classes.root}>
 		<CssBaseline />
+    <Fab color="primary" aria-label="add" className={classes.fab} onClick={() => setPromptShown(true)}>
+      <AddIcon />
+    </Fab>
+    <Prompt
+      open={promptShown}
+      title={"Add new todo"}
+      text={"Enter todo description"}
+      onCancel={() => setPromptShown(false)}
+      onSubmit={_addTodo}
+    />
+    <Snackbar
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      open={typeof toast !== "undefined"}
+      autoHideDuration={6000}
+      onClose={() => setToast(undefined)}
+      message={toast}
+    />
 		<Navigation title="Home" />
     <main className={classes.content}>
       <div className={classes.appBarSpacer} />
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
-          {/* Chart */}
-          <Grid item xs={12} md={8} lg={9}>
-            <Paper className={fixedHeightPaper}>
-            </Paper>
-          </Grid>
-          {/* Recent Deposits */}
-          <Grid item xs={12} md={4} lg={3}>
-            <Paper className={fixedHeightPaper}>
-            </Paper>
-          </Grid>
-          {/* Recent Orders */}
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
-            </Paper>
-          </Grid>
+          {typeof todos !== "undefined" ?
+            todos.map((t, i) => 
+              <TodoItem
+                key={i}
+                status={t.status}
+                text={t.content}
+                onStatusChange={(e, status) => status !== null ? _handleStatus(t.id, status): ""}
+                onEdit={() => console.log("sdsd")}
+              />
+            ):
+            <>
+              <Skeleton variant="rect" width={"100%"} height={118} />
+              <Skeleton variant="text" width={"50%"}/>
+              <Skeleton variant="rect" width={"100%"} height={118} style={{marginTop: 10}} />
+              <Skeleton variant="text" width={"50%"}/>
+            </>
+          }
         </Grid>
-        <Box pt={4}>
-        </Box>
       </Container>
     </main>
   </div>);
