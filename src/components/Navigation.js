@@ -21,7 +21,7 @@ import {
   Menu as MenuIcon, 
   HistoryTwoTone as HistoryIcon,
   AccountCircleTwoTone as AccountIcon,
-  ShoppingCartTwoTone as ShoppingCartIcon
+  Home as HomeIcon
 } from '@material-ui/icons';
 
 
@@ -160,15 +160,9 @@ export default function Navigation(props) {
           <div>
             <ListItem button onClick={()=>{window.location.href="home"}}>
               <ListItemIcon>
-                <ShoppingCartIcon />
+                <HomeIcon />
               </ListItemIcon>
               <ListItemText primary="Home" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <AccountIcon />
-              </ListItemIcon>
-              <ListItemText primary="Account" />
             </ListItem>
           </div>
         </List>
