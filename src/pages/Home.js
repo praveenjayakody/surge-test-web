@@ -103,7 +103,7 @@ export default function Home() {
     <Snackbar
       anchorOrigin={{
         vertical: 'bottom',
-        horizontal: 'right',
+        horizontal: 'left',
       }}
       open={typeof toast !== "undefined"}
       autoHideDuration={6000}
@@ -114,16 +114,17 @@ export default function Home() {
     <main className={classes.content}>
       <div className={classes.appBarSpacer} />
       <Container maxWidth="lg" className={classes.container}>
-        <Grid container spacing={3}>
+        <Grid container spacing={1} direction="row">
           {typeof todos !== "undefined" ?
             todos.map((t, i) => 
-              <TodoItem
-                key={i}
-                status={t.status}
-                text={t.content}
-                onStatusChange={(e, status) => status !== null ? _handleStatus(t.id, status): ""}
-                onEdit={() => console.log("sdsd")}
-              />
+              <Grid item key={i} xs={12} lg={6}>
+                <TodoItem
+                  status={t.status}
+                  text={t.content}
+                  onStatusChange={(e, status) => status !== null ? _handleStatus(t.id, status): ""}
+                  onEdit={() => console.log("")}
+                />
+              </Grid>
             ):
             <>
               <Skeleton variant="rect" width={"100%"} height={118} />

@@ -29,7 +29,7 @@ export default function TodoItem(props) {
 
   return (
     <Grid container style={{marginTop: 5, marginBottom: 5}}>
-        <Grid item xs={12} lg={12}>
+        <Grid item xs={12}>
             <Paper elevation={1} style={{padding: 10}}>
                 <Grid container justifyContent="space-between" alignItems="center">
                     <Grid item>
